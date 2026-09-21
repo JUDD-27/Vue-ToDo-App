@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+	<title>Shopping List</title>
+</head>
+<body>
+    <div id="shopping-list"> 
+
+        <div class="header">
+            <h1>{{header}}</h1>
+            <button v-if="editing" @click="doEdit(false)" class="btn btn-cancel">Cancel</button>
+            <button v-else @click="doEdit(true)" class="btn btn-add">Add Item</button>
+        </div>
+   
+
+        <div v-if="editing" id="new-item-form">
+
+            <input
+                @keyup.enter="saveItem" 
+                v-model="newItem" type="text" placeholder="Add a new item"
+            >
+
+            <label>
+                <input type="checkbox"
+                    v-model="newItemHighPriority"
+                >
+                High Priority
+            </label>
+
+            <button 
+                v-bind:disabled="newItem.length === 0" 
+                @click="saveItem" 
+                class="btn btn-primary">
+                Save Item
+            </button>
+
+        </div>
+       
+        <ul>
+            <li> <p v-if="items.length === 0">You've bought all your items.</p></li>
+           <li v-for="item in reversedItems" 
+           @click="togglePurchased(item)"
+           :key="item.id"
+           :class="{strikeout: item.purchased, priority: item.highPriority}"
+           class="statict-class">
+           {{ item.label }}</li> 
+            
+        </ul>
+        
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@3"></script>
+    <script> 
+       const shoppingListApp = Vue.createApp({
+
+            data() {
+                return { 
+                    header: "My Shopping List",
+                    newItem: "",
+                    editing: false,
+                    newItemHighPriority: false,
+
+
+                    items: [
+                        {id: 1, label: "Milk", purchased: true, highPriority: true},
+                        {id: 2, label: "Eggs", purchased: true, highPriority: true},
+                        {id: 3, label: "Bread", purchased: false, highPriority: false},
+                        {id: 4, label: "Butter", purchased: false, highPriority: false},
+                        {id: 5, label: "Cheese", purchased: false, highPriority: false}
+
+                    ]
+                }
+            },
+
+            computed: {
+                reversedItems() {
+                    return [...this.items].reverse();
+                }
+            },
+            
+            methods: {
+
+                saveItem () { 
+                 this.items.push({ 
+                    id: this.items.length + 1, 
+                    label: this.newItem,
+                    highPriority: this.newItemHighPriority
+                 }) 
+
+                 this.newItem = "";
+                 this.newItemHighPriority = "";
+
+                },
+
+
+                doEdit(editing) {
+                    this.editing = editing;
+                    this.newItem = "";
+                    this.newItemHighPriority = "";
+            
+                },
+
+                togglePurchased(item) {
+                    item.purchased = !item.purchased;
+                }
+
+            }
+        })
+        .mount('#shopping-list');
+    </script>
+</body>
+</html>
